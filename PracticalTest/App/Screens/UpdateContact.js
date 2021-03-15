@@ -13,7 +13,7 @@ import Contacts from 'react-native-contacts';
 
 let db;
 
-class AddContacts extends Component {
+class UpdateContact extends Component {
 
 	constructor(props) {
 		super(props);
@@ -24,6 +24,7 @@ class AddContacts extends Component {
 			email: '',
 			category: '',
 			categoryArr: [],
+			id:'',
 			profileImage: {
 				name: '',
 				type: 'image/jpeg',
@@ -46,17 +47,21 @@ class AddContacts extends Component {
 		this.focusListener = this.props.navigation.addListener('focus', () => {
 			this.getCategory();
 		});
+
+		const { item } = this.props.route.params;
+		this.setState({
+			firstName: item.firstName?item.firstName:'',
+			lastName: item.lastName?item.lastName:'',
+			contactNumber: item.contactNumber?item.contactNumber:'',
+			email: item.email?item.email:'',
+			category: item.category?item.category:'',
+			id:item.id?item.id:'',
+			profileImage:item.image?Object.assign({...this.state.profileImage},{uri:item.image}):''
+		})
 	}
 
 	success = () => {
-		db.transaction(tx => {
-			tx.executeSql(
-				'CREATE TABLE IF NOT EXISTS Contacts(id INTEGER PRIMARY KEY AUTOINCREMENT, firstName VARCHAR(10),lastName VARCHAR(10),email VARCHAR(20),contactNumber VARCHAR(10), category VARCHAR(10),image BLOB)',
-				[],
-			);
-		});
 		this.getCategory()
-
 	};
 
 	fail = error => {
@@ -110,15 +115,15 @@ class AddContacts extends Component {
 			return;
 
 		} else {
-			this.insertContact();
-			PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS).then(response => {
+			this.updateContact();
+			/* PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS).then(response => {
 				if (response) {
 
 					this.addContactsToPhone();
 				} else {
 					this.requestContactPermission();
 				}
-			});
+			}); */
 
 		}
 	}
@@ -136,15 +141,32 @@ class AddContacts extends Component {
 		});
 	}
 
-	insertContact = () => {
+	updateContact = () => {
 		let firstName = this.state.firstName;
 		let lastName = this.state.lastName;
 		let contactNumber = this.state.contactNumber;
 		let email = this.state.email;
 		let category = this.state.category;
 		let image = this.state.profileImage.uri
+		let id = this.state.id
 
-		db.transaction(function (tx) {
+		db.transaction(tx => {
+			tx.executeSql(
+			  'UPDATE Contacts set firstName=?,lastName=?,contactNumber=?,email=?,category=?,image=? where id=?',
+			  [firstName, lastName, contactNumber, email, category, image,id],
+			  (tx, results) => {
+				console.log('Results', results.rowsAffected);
+				if (results.rowsAffected > 0) {
+				  alert('Contact updated successfully');
+				  this.setState({
+					btnTitle:'Save'
+				  })
+				} else alert('Updation Failed');
+			  },
+			);
+		  });
+
+		/* db.transaction(function (tx) {
 			tx.executeSql(
 				'INSERT INTO Contacts (firstName,lastName,contactNumber,email,category,image) VALUES (?,?,?,?,?,?)',
 				[firstName, lastName, contactNumber, email, category, image],
@@ -157,7 +179,7 @@ class AddContacts extends Component {
 					};
 				},
 			);
-		});
+		}); */
 	};
 
 	openImagePicker = () => {
@@ -273,7 +295,7 @@ class AddContacts extends Component {
 					<TouchableOpacity
 						style={commonStyles.button}
 						onPress={this.saveContact}>
-						<Text>Save</Text>
+						<Text>Update</Text>
 					</TouchableOpacity>
 				</View>
 			</KeyboardAwareScrollView>
@@ -299,4 +321,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default AddContacts;
+export default UpdateContact;

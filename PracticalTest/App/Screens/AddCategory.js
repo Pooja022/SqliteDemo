@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Alert
 } from 'react-native';
 import Colors from '../Utils/Colors';
+import Constant from '../Utils/Constant';
 import SQLite from 'react-native-sqlite-storage';
 import Images from '../Utils/Images';
+import { commonStyles } from '../Utils/CommonStyles';
 
 let db;
 
@@ -26,7 +29,7 @@ class AddCategory extends Component {
 
     db = SQLite.openDatabase(
       {
-        name: 'dbTest.db',
+        name: Constant.DBNAME,
         createFromLocation: 2,
       },
       this.success, //okCallback
@@ -85,6 +88,8 @@ class AddCategory extends Component {
     });
   };
 
+
+
   insertCategory = () => {
     let name = this.state.categoryName;
 
@@ -96,7 +101,7 @@ class AddCategory extends Component {
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
             alert('Category inserted Successfully');
-          } else alert('Please try again');
+          } else alert(Constant.tryAgain);
         },
       );
     });
@@ -119,6 +124,27 @@ class AddCategory extends Component {
     });
   };
 
+  onDeletePress = (itemId) => {
+	Alert.alert(
+		//title
+		'Delete Category',
+		//body
+		'Are you sure you want to delete this Category ?',
+		[
+			{
+				text: 'Yes',
+				onPress: () => this.deleteCategory(itemId)
+			},
+			{
+				text: 'No',
+				onPress: () => console.log('No Pressed'), style: 'cancel'
+			},
+		],
+		{ cancelable: false },
+		//clicking out side of alert will not cancel
+	);
+}
+
   deleteCategory = itemId => {
     db.transaction(tx => {
       tx.executeSql(
@@ -138,7 +164,7 @@ class AddCategory extends Component {
   };
 
   updateCategory = item => {
-    alert(JSON.stringify(item));
+    //alert(JSON.stringify(item));
     this.setState({
       categoryName: item.name,
       btnTitle: 'Update',
@@ -150,12 +176,12 @@ class AddCategory extends Component {
     const {category, btnTitle, categoryName} = this.state;
     return (
       <View style={styles.container}>
-        <View style={styles.container}>
+        <View style={{justifyContent:'space-around',flex:1,alignItems:'center'}}>
           <TextInput
             value={categoryName}
             placeholder={'Add Category'}
             maxLength={10}
-            style={styles.inputStyle}
+			style={[commonStyles.inputStyle,{width:200}]}
             onChangeText={value => this.handleChange(value, 'categoryName')}
           />
 
@@ -173,7 +199,7 @@ class AddCategory extends Component {
               contentContainerStyle={{marginBottom: 20}}
               keyExtractor={item => item.cid.toString()}
               renderItem={({item}) =>
-                renderCategory(item, this.updateCategory, this.deleteCategory)
+                renderCategory(item, this.updateCategory, this.onDeletePress)
               }
             />
           ) : (
@@ -185,7 +211,7 @@ class AddCategory extends Component {
   }
 }
 
-const renderCategory = (item, onUpdateCategory, onDeleteCategory) => {
+const renderCategory = (item, onUpdateCategory, onDeletePress) => {
   return (
     <View>
 
@@ -201,7 +227,7 @@ const renderCategory = (item, onUpdateCategory, onDeleteCategory) => {
           <Image source={Images.Edit} style={styles.imageStyle} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => onDeleteCategory(item.cid)}>
+        <TouchableOpacity onPress={() => onDeletePress(item.cid)}>
           <Image source={Images.delete1} style={styles.imageStyle} />
         </TouchableOpacity>
       </View>
@@ -235,11 +261,7 @@ const styles = StyleSheet.create({
     marginVertical: 3,
   },
 
-  inputStyle: {
-    borderWidth: 1,
-    borderColor: Colors.primaryColor,
-    width: 200,
-  },
+ 
 
   buttonStyle: {
     backgroundColor: Colors.primaryColor,

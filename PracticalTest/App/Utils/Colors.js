@@ -4,6 +4,8 @@ export default {
 	categoryBackground:'#ffe1bb',
 	categorySeprator:'#ffc77e',
 	background:'#fff',
-	contactListSeprator:'#89cdbb'
+	contactListSeprator:'#89cdbb',
+	black:'black',
+	white:'white'
 
 }

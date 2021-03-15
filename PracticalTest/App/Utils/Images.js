@@ -4,6 +4,7 @@ import filter from '../assets/filter.png';
 import menu from '../assets/menu.png';
 import profile from '../assets/profile.png';
 import search from '../assets/search.png';
+import close from '../assets/close.png';
 
 const Images = {
     Edit,
@@ -11,7 +12,8 @@ const Images = {
     filter,
     menu,
     profile,
-    search
+    search,
+	close
 }
 
 export default Images;
