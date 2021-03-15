@@ -14,6 +14,7 @@ import Constant from '../Utils/Constant';
 import SQLite from 'react-native-sqlite-storage';
 import Images from '../Utils/Images';
 import { commonStyles } from '../Utils/CommonStyles';
+import { printLog } from '../Utils/Validator';
 
 let db;
 
@@ -153,7 +154,7 @@ class AddCategory extends Component {
         (tx, results) => {
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
-            alert('Category deleted successfully');
+            printLog('Category deleted successfully');
           } else {
             alert('Please insert a valid User Id');
           }
