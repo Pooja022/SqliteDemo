@@ -106,7 +106,6 @@ class AddCategory extends Component {
 				(tx, results) => {
 					console.log('Results', results.rowsAffected);
 					if (results.rowsAffected > 0) {
-						alert('Category inserted Successfully');
 					} else alert(Constant.tryAgain);
 				},
 			);

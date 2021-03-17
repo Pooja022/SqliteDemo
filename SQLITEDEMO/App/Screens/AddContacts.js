@@ -268,7 +268,7 @@ class AddContacts extends Component {
 						style={commonStyles.inputStyle}
 						onChangeText={value => this.handleChange(value, 'email')}
 					/>
-					<View style={commonStyles.inputStyle}>
+					<View style={commonStyles.pickerStyle}>
 						<Picker mode={'dropdown'}
 							selectedValue={category}
 							onValueChange={value => { this.handleChange(value, 'category') }}>
